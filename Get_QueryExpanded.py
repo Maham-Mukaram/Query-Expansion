@@ -6,7 +6,29 @@ import transformers
 import torch
 
 # List of tasks for query expansion
-TASK_LIST = ["dbpedia-entity", "nq", "scifact", "trec-covid", "webis-touche2020"]
+TASK_LIST = [
+    "arguana",
+    "cqadupstack/android",
+    "cqadupstack/english",
+    "cqadupstack/gaming",
+    "cqadupstack/gis",
+    "cqadupstack/mathematica",
+    "cqadupstack/physics",
+    "cqadupstack/programmers",
+    "cqadupstack/stats",
+    "cqadupstack/stats",
+    "cqadupstack/tex",
+    "cqadupstack/unix",
+    "cqadupstack/webmasters",
+    "cqadupstack/wordpress",
+    "fiqa",
+    "nfcorpus",
+    "nq",
+    "scidocs",
+    "scifact",
+    "webis-touche2020",
+    "trec-covid"
+]
 
 # Different prompt types for query expansion
 PROMPTS = [
@@ -19,10 +41,14 @@ PROMPTS = [
 def parse_args():
     parser = argparse.ArgumentParser()
 
+    # define if only want to run for specific tasks
+    parser.add_argument("--startid", type=int)
+    parser.add_argument("--endid", type=int)
+
     # Define model engine, prompt type, and path where original query file present and new query file to be saved
     parser.add_argument("--engine", type=str, default="meta-llama/Llama-2-7b-hf")
     parser.add_argument("--prompttype", type=str, default="Q2D")
-    parser.add_argument("--datapath", type=str, default="Datasets/Expanded_Llama")
+    parser.add_argument("--datapath", type=str, default="Datasets")
 
     args = parser.parse_args()
     return args
@@ -33,7 +59,7 @@ def main(args):
     tokenizer = AutoTokenizer.from_pretrained(model)
     pipeline = transformers.pipeline("text-generation", model=model, torch_dtype=torch.float16, device_map=0)
 
-    for task in TASK_LIST:
+    for task in TASK_LIST[args.startid:args.endid]:
         input_file = f"{args.datapath}/{task}/queries.jsonl"
         output_dir = f"{args.datapath}/{task}"
 
